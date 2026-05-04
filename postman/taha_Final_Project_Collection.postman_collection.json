@@ -1,0 +1,688 @@
+{
+  "info": {
+    "_postman_id": "2a066b6d-d1fe-4290-b6fa-e40e2c32e15f",
+    "name": "taha_Final_Project_Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52546810",
+    "_collection_link": "https://go.postman.co/collection/52546810-2a066b6d-d1fe-4290-b6fa-e40e2c32e15f?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "CreateOrg",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"organizationName\": \"Robotics\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://campus-event-coordination-system.onrender.com/organizations",
+          "protocol": "https",
+          "host": [
+            "campus-event-coordination-system",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "organizations"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ViewAllOrgs",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://campus-event-coordination-system.onrender.com/organizations",
+          "protocol": "https",
+          "host": [
+            "campus-event-coordination-system",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "organizations"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DeleteOrg",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "https://campus-event-coordination-system.onrender.com/organizations/69f8895f621fe20050563732",
+          "protocol": "https",
+          "host": [
+            "campus-event-coordination-system",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "organizations",
+            "69f8895f621fe20050563732"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ValidSignup",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"name\": \"maabSHPE\",\r\n  \"username\": \"maabSHPE\",\r\n  \"password\": \"123456\",\r\n  \"organizationID\": \"69f82acdfef18b4af8b5bd2d\"\r\n}\r\n\r\n// [\r\n//     {\r\n//         \"_id\": \"69f82a9dfef18b4af8b5bd29\",\r\n//         \"organizationName\": \"Lynx Robotics\",\r\n//         \"__v\": 0\r\n//     },\r\n//     {\r\n//         \"_id\": \"69f82acdfef18b4af8b5bd2d\",\r\n//         \"organizationName\": \"SHPE\",\r\n//         \"__v\": 0\r\n//     },\r\n//     {\r\n//         \"_id\": \"69f82ad2fef18b4af8b5bd2f\",\r\n//         \"organizationName\": \"AISA\",\r\n//         \"__v\": 0\r\n//     },\r\n//     {\r\n//         \"_id\": \"69f8347283419850d805fbf2\",\r\n//         \"organizationName\": \"NSBE\",\r\n//         \"__v\": 0\r\n//     }\r\n// ]",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://campus-event-coordination-system.onrender.com/signup",
+          "protocol": "https",
+          "host": [
+            "campus-event-coordination-system",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "signup"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ValidSignin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const jsonData = pm.response.json();\r",
+              "pm.environment.set(\"token\", jsonData.token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"maabSHPE\",\r\n  \"password\": \"123456\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://campus-event-coordination-system.onrender.com/signin",
+          "protocol": "https",
+          "host": [
+            "campus-event-coordination-system",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "signin"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ViewAllEvents",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://campus-event-coordination-system.onrender.com/events",
+          "protocol": "https",
+          "host": [
+            "campus-event-coordination-system",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "events"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "QueryByDay",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://campus-event-coordination-system.onrender.com/events?date=2026-05-12",
+          "protocol": "https",
+          "host": [
+            "campus-event-coordination-system",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "events"
+          ],
+          "query": [
+            {
+              "key": "date",
+              "value": "2026-05-12"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "QueryByWeek",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://campus-event-coordination-system.onrender.com/events?start=2026-05-01&end=2026-05-10",
+          "protocol": "https",
+          "host": [
+            "campus-event-coordination-system",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "events"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "2026-05-01"
+            },
+            {
+              "key": "end",
+              "value": "2026-05-10"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "QueryByOrg",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://campus-event-coordination-system.onrender.com/events?organization=69f82acdfef18b4af8b5bd2d",
+          "protocol": "https",
+          "host": [
+            "campus-event-coordination-system",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "events"
+          ],
+          "query": [
+            {
+              "key": "organization",
+              "value": "69f82acdfef18b4af8b5bd2d"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "CreateEvent",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"title\": \"SHPE Workshop 4\", \"location\": \"Room 202\", \"startTime\": \"2026-05-12T10:00:00.000Z\", \"endTime\": \"2026-05-12T12:00:00.000Z\" \r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://campus-event-coordination-system.onrender.com/events",
+          "protocol": "https",
+          "host": [
+            "campus-event-coordination-system",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "events"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DeleteEvent",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "https://campus-event-coordination-system.onrender.com/events/69f88c7c28a4f65578edf386",
+          "protocol": "https",
+          "host": [
+            "campus-event-coordination-system",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "events",
+            "69f88c7c28a4f65578edf386"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "UpdateEvent",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n//   \"title\": \"Updated SHPE Workshop\"\r\n  \"location\": \"Room 101\"\r\n//   \"startTime\": \"2026-05-10T11:00:00.000Z\",\r\n//   \"endTime\": \"2026-05-10T13:00:00.000Z\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://campus-event-coordination-system.onrender.com/events/69f84ab206ae1e583008109f",
+          "protocol": "https",
+          "host": [
+            "campus-event-coordination-system",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "events",
+            "69f84ab206ae1e583008109f"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ViewOneEvent",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://campus-event-coordination-system.onrender.com/events/69f84ab206ae1e583008109f",
+          "protocol": "https",
+          "host": [
+            "campus-event-coordination-system",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "events",
+            "69f84ab206ae1e583008109f"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "CreateFeeback",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"eventId\": \"69f84ab206ae1e583008109f\",\r\n  \"feedback\": \"Room didn't have capacity for number of attendees. Get a sense of attendance and reserve a room accordingly. Otherwise workshop went smoothly\",\r\n  \"rating\": 4\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://campus-event-coordination-system.onrender.com/feedback",
+          "protocol": "https",
+          "host": [
+            "campus-event-coordination-system",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "feedback"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ViewFeeback",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://campus-event-coordination-system.onrender.com/feedback",
+          "protocol": "https",
+          "host": [
+            "campus-event-coordination-system",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "feedback"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

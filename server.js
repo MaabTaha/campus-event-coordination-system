@@ -273,6 +273,7 @@ router.route('/events')
     res.status(500).json({ message: err.message });
   }
 })
+
 .post(authJwtController.isAuthenticated, async (req, res) => {
   try {
     const { title, location, startTime, endTime } = req.body;
@@ -282,46 +283,37 @@ router.route('/events')
     const start = new Date(startTime);
     const end = new Date(endTime);
 
-    const exactDuplicate = await Event.findOne({
-      location: location.trim().toLowerCase(),
-      startTime: start,
-      endTime: end,
-      organizationID
-    });
-
-    if (exactDuplicate) {
-      return res.status(409).json({
-        message: "You're hosting another event at the same location"
-      });
-    }
-    // Conflict detection based on room reserved
-    const conflicts = await Event.find({
-      // organizationID: organizationID,
+    // -----------------------------
+    // HARD CONFLICT (same room)
+    // -----------------------------
+    const roomConflicts = await Event.find({
       location: location.trim().toLowerCase(),
       startTime: { $lt: end },
       endTime: { $gt: start }
     });
 
-    // Block event creation if overlap exists
-    // if (conflicts.length > 0) {
-    //   return res.status(409).json({
-    //     message: "Room is already booked during this time slot",
-    //     conflicts
-    //   });
-    // }
-    if (conflicts.length > 0) {
+    if (roomConflicts.length > 0) {
       return res.status(409).json({
+        type: "HARD_CONFLICT",
         message: `Room "${location}" is already booked during this time slot`,
-        conflicts: conflicts.map(c => ({
+        conflicts: roomConflicts.map(c => ({
           title: c.title,
           organizationID: c.organizationID,
           startTime: c.startTime,
-          endTime: c.endTime
+          endTime: c.endTime,
+          location: c.location
         }))
       });
     }
 
-    // Create event
+    // SOFT CONFLICT (time overlap, different orgs)
+
+    const timeConflicts = await Event.find({
+      startTime: { $lt: end },
+      endTime: { $gt: start }
+    }).populate('organizationID', 'organizationName');
+
+    // CREATE EVENT
     const newEvent = new Event({
       title,
       location: location.trim().toLowerCase(),
@@ -332,7 +324,25 @@ router.route('/events')
 
     await newEvent.save();
 
-    res.status(201).json({
+    if (timeConflicts.length > 0) {
+      return res.status(201).json({
+        type: "WARNING",
+        message: "Event created, but there are overlapping events happening at the same time. Consider selecting a different time or date.",
+        event: newEvent,
+        conflicts: timeConflicts.map(c => ({
+          title: c.title,
+          organizationName: c.organizationID.organizationName,
+          startTime: c.startTime,
+          endTime: c.endTime,
+          location: c.location
+        }))
+      });
+    }
+
+    // No conflicts
+    return res.status(201).json({
+      type: "SUCCESS",
+      message: "Event created successfully. No scheduling conflicts 🎉",
       event: newEvent
     });
 
@@ -340,7 +350,6 @@ router.route('/events')
     res.status(400).json({ message: err.message });
   }
 });
-
 
 
 // --------------------------------------------
