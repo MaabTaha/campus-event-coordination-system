@@ -86,7 +86,7 @@ router.post('/signin', async (req, res) => { // Use async/await
         organizationID: user.organizationID
       };
       const token = jwt.sign(userToken, process.env.SECRET_KEY, { expiresIn: '1h' }); // Add expiry to the token (1 hour)
-      res.json({ success: true, token: 'JWT ' + token });
+      res.json({ success: true, token});
     } else {
       res.status(401).json({ success: false, msg: 'Authentication failed. Incorrect password.' }); // 401 Unauthorized
     }
@@ -145,79 +145,205 @@ router.post('/feedback', authJwtController.isAuthenticated, async (req, res) => 
 router.get('/feedback', authJwtController.isAuthenticated, async (req, res) => {
   try {
     const feedback = await EventFeedback.find()
-      .populate('eventId', 'title')
-      // .populate('userId', 'username');
+      .populate('eventId', 'title');
 
-    res.json(feedback);
+    const cleaned = feedback.map(f => ({
+      id: f._id,
+      eventId: f.eventId?._id,
+      eventTitle: f.eventId?.title,
+      username: f.username,
+      rating: f.rating,
+      comment: f.feedback
+    }));
+
+    res.json(cleaned);
+
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
-// --------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------
 
+// --------------------------------------------------------------------------------------------------
 
 router.route('/events')
 
-  .get(authJwtController.isAuthenticated, async (req, res) => {
-    try {
-      const events = await Event.aggregate([
-        {
-          $lookup: {
-            from: 'eventfeedbacks',
-            localField: '_id',
-            foreignField: 'eventId',
-            as: 'feedback'
-          }
-        },
-        {
-          $addFields: {
-            avgRating: { $avg: '$feedback.rating' }
-          }
-        },
-        {
-          $sort: { startTime: 1 }
+
+.get(authJwtController.isAuthenticated, async (req, res) => {
+  try {
+    const { date, start, end, organization } = req.query;
+
+    let match = {};
+
+    // ORG FILTER
+    if (organization) {
+      match.organizationID = new mongoose.Types.ObjectId(organization);
+    }
+
+    // DAY VIEW
+    // /events?date=2026-05-10
+    if (date) {
+      const day = new Date(date);
+
+      const startOfDay = new Date(Date.UTC(
+        day.getUTCFullYear(),
+        day.getUTCMonth(),
+        day.getUTCDate(),
+        0, 0, 0, 0
+      ));
+
+      const endOfDay = new Date(Date.UTC(
+        day.getUTCFullYear(),
+        day.getUTCMonth(),
+        day.getUTCDate(),
+        23, 59, 59, 999
+      ));
+
+      match.startTime = { $lte: endOfDay };
+      match.endTime = { $gte: startOfDay };
+    }
+
+    // WEEK VIEW (or custom range)
+    // /events?start=...&end=...
+    if (start && end) {
+      const rangeStart = new Date(start + "T00:00:00Z");
+      const rangeEnd = new Date(end + "T00:00:00Z");
+
+      const startOfRange = new Date(Date.UTC(
+        rangeStart.getUTCFullYear(),
+        rangeStart.getUTCMonth(),
+        rangeStart.getUTCDate(),
+        0, 0, 0, 0
+      ));
+
+      const endOfRange = new Date(Date.UTC(
+        rangeEnd.getUTCFullYear(),
+        rangeEnd.getUTCMonth(),
+        rangeEnd.getUTCDate(),
+        23, 59, 59, 999
+      ));
+
+      match.startTime = { $lte: endOfRange };
+      match.endTime = { $gte: startOfRange };
+    }
+    // Aggregation
+    const events = await Event.aggregate([
+      { $match: match },
+
+      {
+        $lookup: {
+          from: 'eventfeedbacks',
+          localField: '_id',
+          foreignField: 'eventId',
+          as: 'feedback'
         }
-      ]);
+      },
+      {
+        $lookup: {
+          from: 'organizations',
+          localField: 'organizationID',
+          foreignField: '_id',
+          as: 'org'
+        }
+      },
+      {
+        $addFields: {
+          avgRating: { $avg: '$feedback.rating' },
+          organizationName: { $arrayElemAt: ['$org.organizationName', 0] }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          location: 1,
+          startTime: 1,
+          endTime: 1,
+          status: 1,
+          organizationName: 1,
+          organizationID: 1,
+          avgRating: 1
+        }
+      },
+      { $sort: { startTime: 1 } }
+    ]);
 
-      res.json(events);
+    res.json(events);
 
-    } catch (err) {
-      res.status(500).json({ message: err.message });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+})
+.post(authJwtController.isAuthenticated, async (req, res) => {
+  try {
+    const { title, location, startTime, endTime } = req.body;
+
+    const organizationID = req.user.organizationID;
+
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+
+    const exactDuplicate = await Event.findOne({
+      location: location.trim().toLowerCase(),
+      startTime: start,
+      endTime: end,
+      organizationID
+    });
+
+    if (exactDuplicate) {
+      return res.status(409).json({
+        message: "You're hosting another event at the same location"
+      });
     }
-  })
-  .post(authJwtController.isAuthenticated, async (req, res) => {
-    try {
-      const { title, location, startTime, endTime } = req.body;
+    // Conflict detection based on room reserved
+    const conflicts = await Event.find({
+      // organizationID: organizationID,
+      location: location.trim().toLowerCase(),
+      startTime: { $lt: end },
+      endTime: { $gt: start }
+    });
 
-      const organizationID = req.user.organizationID;
-
-      // Conflict detection
-      const conflicts = await Event.find({
-        startTime: { $lt: new Date(endTime) },
-        endTime: { $gt: new Date(startTime) }
+    // Block event creation if overlap exists
+    // if (conflicts.length > 0) {
+    //   return res.status(409).json({
+    //     message: "Room is already booked during this time slot",
+    //     conflicts
+    //   });
+    // }
+    if (conflicts.length > 0) {
+      return res.status(409).json({
+        message: `Room "${location}" is already booked during this time slot`,
+        conflicts: conflicts.map(c => ({
+          title: c.title,
+          organizationID: c.organizationID,
+          startTime: c.startTime,
+          endTime: c.endTime
+        }))
       });
-
-      const newEvent = new Event({
-        title,
-        location,
-        startTime,
-        endTime,
-        organizationID
-      });
-
-      await newEvent.save();
-
-      res.status(201).json({
-        event: newEvent,
-        conflicts   //  RETURN conflicts
-      });
-
-    } catch (err) {
-      res.status(400).json({ message: err.message });
     }
+
+    // Create event
+    const newEvent = new Event({
+      title,
+      location: location.trim().toLowerCase(),
+      startTime: start,
+      endTime: end,
+      organizationID
+    });
+
+    await newEvent.save();
+
+    res.status(201).json({
+      event: newEvent
+    });
+
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
+
+
+
+// --------------------------------------------
 
 router.route('/events/:id')
 
@@ -229,18 +355,47 @@ router.route('/events/:id')
       return res.status(404).json({ message: 'Event not found' });
     }
 
-    // SECURITY CHECK
-    if (event.organizationID.toString() !== req.user.organizationID) {
+    // ownership check
+    if (event.organizationID.toString() !== req.user.organizationID.toString()) {
       return res.status(403).json({ message: 'Not allowed' });
     }
 
-    const updatedEvent = await Event.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    const title = req.body.title ?? event.title;
+    const location = (req.body.location ?? event.location).trim().toLowerCase();
+    const start = new Date(req.body.startTime ?? event.startTime);
+    const end = new Date(req.body.endTime ?? event.endTime);
 
-    res.json(updatedEvent);
+    // HARD BLOCK: room + time conflict (exclude itself)
+    const conflicts = await Event.find({
+      _id: { $ne: event._id }, 
+      location,
+      startTime: { $lt: end },
+      endTime: { $gt: start }
+    });
+
+    if (conflicts.length > 0) {
+      return res.status(409).json({
+        message: `Room "${location}" is already booked during this time slot`,
+        conflicts: conflicts.map(c => ({
+          title: c.title,
+          organizationID: c.organizationID,
+          startTime: c.startTime,
+          endTime: c.endTime
+        }))
+      });
+    }
+
+    // apply update
+    event.title = title;
+    event.location = req.body.location
+      ? req.body.location.trim().toLowerCase()
+      : event.location;
+    event.startTime = start;
+    event.endTime = end;
+
+    await event.save();
+
+    res.json(event);
 
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -256,7 +411,11 @@ router.route('/events/:id')
     }
 
     // SECURITY CHECK
-    if (event.organizationID.toString() !== req.user.organizationID) {
+    // if (event.organizationID.toString() !== req.user.organizationID) {
+    //   return res.status(403).json({ message: 'Not allowed' });
+    // }
+
+    if (event.organizationID.toString() !== req.user.organizationID.toString()) {
       return res.status(403).json({ message: 'Not allowed' });
     }
 
@@ -270,7 +429,11 @@ router.route('/events/:id')
 });
 
 
-router.get('/events/:id', authJwtController.isAuthenticated, async (req, res) => {
+
+// --------------------------------------------
+
+
+router.get('/events/:id', async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
 
@@ -284,6 +447,9 @@ router.get('/events/:id', authJwtController.isAuthenticated, async (req, res) =>
     res.status(400).json({ message: err.message });
   }
 });
+
+
+// --------------------------------------------
 
 router.post('/organizations', async (req, res) => {
   try {
