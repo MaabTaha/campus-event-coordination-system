@@ -1,0 +1,512 @@
+{
+  "info": {
+    "_postman_id": "28a6f33f-96c7-4671-982c-0114d5ac3acc",
+    "name": "taha_HW5_Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52546810",
+    "_collection_link": "https://go.postman.co/collection/52546810-28a6f33f-96c7-4671-982c-0114d5ac3acc?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "ValidSignup",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"name\": \"Maab4\",\r\n  \"username\": \"Maab4\",\r\n  \"password\": \"123456\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://webapi-hw5.onrender.com/signup",
+          "protocol": "https",
+          "host": [
+            "webapi-hw5",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "signup"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ValidSignin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const jsonData = pm.response.json();\r",
+              "pm.environment.set(\"token\", jsonData.token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"Maab2\",\r\n  \"password\": \"123456\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://webapi-hw5.onrender.com/signin",
+          "protocol": "https",
+          "host": [
+            "webapi-hw5",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "signin"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ViewAllMovies",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "https://webapi-hw5.onrender.com/movies",
+          "protocol": "https",
+          "host": [
+            "webapi-hw5",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "movies"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ViewOneMovies",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "https://webapi-hw5.onrender.com/movies/69e4f1281d62076e6c0bf37c",
+          "protocol": "https",
+          "host": [
+            "webapi-hw5",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "movies",
+            "69e4f1281d62076e6c0bf37c"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DeleteMovie",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "authorization",
+            "value": "{{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "https://webapi-hw5.onrender.com/movies/69e3f17397b8d108c8fe2959",
+          "protocol": "https",
+          "host": [
+            "webapi-hw5",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "movies",
+            "69e3f17397b8d108c8fe2959"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "AddMovie",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Toy Story\",\r\n  \"releaseDate\": 1995,\r\n  \"genre\": \"Adventure\",\r\n  \"actors\": [\r\n    {\r\n      \"actorName\": \"Tom Hanks\",\r\n      \"characterName\": \"Woody\"\r\n    },\r\n    {\r\n      \"actorName\": \"Tim Allen\",\r\n      \"characterName\": \"Buzz Lightyear\"\r\n    }\r\n  ],\r\n  \"imageUrl\": \"https://picsum.photos/600/400\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://webapi-hw5.onrender.com/movies",
+          "protocol": "https",
+          "host": [
+            "webapi-hw5",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "movies"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "UpdateMovie",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"genre\": \"Adventure\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://webapi-hw5.onrender.com/movies/69e454dfb7843425b05383d8",
+          "protocol": "https",
+          "host": [
+            "webapi-hw5",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "movies",
+            "69e454dfb7843425b05383d8"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "AddMoreMovies-POST",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"WALL-E Part 2\",\r\n  \"releaseDate\": 2008,\r\n  \"genre\": \"Science Fiction\",\r\n  \"actors\": [\r\n    {\r\n      \"actorName\": \"Ben Burtt\",\r\n      \"characterName\": \"WALL-E\"\r\n    },\r\n    {\r\n      \"actorName\": \"Elissa Knight\",\r\n      \"characterName\": \"EVE\"\r\n    }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://webapi-hw5.onrender.com/movies",
+          "protocol": "https",
+          "host": [
+            "webapi-hw5",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "movies"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "CreateReview",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          },
+          {
+            "key": "",
+            "value": "",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"movieId\": \"69f11ec53f5d29003eefb47e\",\r\n  \"review\": \"Lovely!\",\r\n  \"rating\": 4\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://webapi-hw5.onrender.com/reviews",
+          "protocol": "https",
+          "host": [
+            "webapi-hw5",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "reviews"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DupCreateReview",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          },
+          {
+            "key": "",
+            "value": "",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"movieId\": \"69e454dfb7843425b05383d8\",\r\n  \"review\": \"great to watch with family\",\r\n  \"rating\": 5\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://webapi-hw5.onrender.com/reviews",
+          "protocol": "https",
+          "host": [
+            "webapi-hw5",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "reviews"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "InvalidCreateReview",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          },
+          {
+            "key": "",
+            "value": "",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"movieId\": \"1169e454dfb7843425b05383\",\r\n  \"review\": \"great to watch with family\",\r\n  \"rating\": 5\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://webapi-hw5.onrender.com/reviews",
+          "protocol": "https",
+          "host": [
+            "webapi-hw5",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "reviews"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ViewOneMovRev",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "https://webapi-hw5.onrender.com/movies/69e454dfb7843425b05383d8?reviews=true",
+          "protocol": "https",
+          "host": [
+            "webapi-hw5",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "movies",
+            "69e454dfb7843425b05383d8"
+          ],
+          "query": [
+            {
+              "key": "reviews",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "InvalidViewOneMovRev",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "https://webapi-hw5.onrender.com/movies/1169e454dfb7843425b05383?reviews=true",
+          "protocol": "https",
+          "host": [
+            "webapi-hw5",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "movies",
+            "1169e454dfb7843425b05383"
+          ],
+          "query": [
+            {
+              "key": "reviews",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ViewReviews",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "https://webapi-hw5.onrender.com/reviews",
+          "protocol": "https",
+          "host": [
+            "webapi-hw5",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "reviews"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "SearchMovie",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "https://webapi-hw5.onrender.com/movies/search",
+          "protocol": "https",
+          "host": [
+            "webapi-hw5",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "movies",
+            "search"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
